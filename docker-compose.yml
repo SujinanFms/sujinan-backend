@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    container_name: sujinan-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: sujinan
+    networks:
+      - sujinan-network
+    command: ["/wait-for.sh", "db", "./main"]
+
+  db:
+    image: postgres:15
+    container_name: sujinan-db
+    restart: always
+    environment:
+      POSTGRES_DB: sujinan
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - sujinan-network
+
+volumes:
+  db-data:
+
+networks:
+  sujinan-network:
